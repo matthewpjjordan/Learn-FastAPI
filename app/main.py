@@ -1,15 +1,15 @@
 # uvicorn app.main:app --reload
 
 from typing import Optional
-from fastapi import FastAPI, Response, status, HTTPException
+from fastapi import FastAPI, Response, status, HTTPException, Depends
 from fastapi.params import Body
 from pydantic import BaseModel
-from random import randrange
 from psycopg2.extras import RealDictCursor
 from time import sleep
 from dotenv import load_dotenv
 from . import models
-from .database import engine, SessionLocal
+from .database import engine, get_db
+from sqlalchemy.orm import Session
 import psycopg2
 import os
 
@@ -18,15 +18,6 @@ models.Base.metadata.create_all(bind=engine)
 load_dotenv()
 
 app = FastAPI()
-
-
-# Dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 class Post(BaseModel):
@@ -57,6 +48,11 @@ while True:
 @app.get("/")
 def root():
     return {"message": "That's better"}
+
+
+@app.get("/sqlalchemy")
+def test_posts(db: Session = Depends(get_db)):
+    return {"status": "success"}
 
 
 @app.get("/posts")
