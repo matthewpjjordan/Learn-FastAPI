@@ -41,12 +41,6 @@ while True:
         sleep(2)
 
 
-def find_index_post(id):
-    for i, p in enumerate(my_posts):
-        if p["id"] == id:
-            return i
-
-
 @app.get("/")
 def root():
     return {"message": "That's better"}
