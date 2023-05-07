@@ -8,12 +8,25 @@ from random import randrange
 from psycopg2.extras import RealDictCursor
 from time import sleep
 from dotenv import load_dotenv
+from . import models
+from .database import engine, SessionLocal
 import psycopg2
 import os
+
+models.Base.metadata.create_all(bind=engine)
 
 load_dotenv()
 
 app = FastAPI()
+
+
+# Dependency
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 class Post(BaseModel):
