@@ -3,11 +3,10 @@
 from typing import Optional
 from fastapi import FastAPI, Response, status, HTTPException, Depends
 from fastapi.params import Body
-from pydantic import BaseModel
 from psycopg2.extras import RealDictCursor
 from time import sleep
 from dotenv import load_dotenv
-from . import models
+from . import models, schemas
 from .database import engine, get_db
 from sqlalchemy.orm import Session
 import psycopg2
@@ -18,12 +17,6 @@ models.Base.metadata.create_all(bind=engine)
 load_dotenv()
 
 app = FastAPI()
-
-
-class Post(BaseModel):
-    title: str
-    content: str
-    published: bool = True
 
 
 while True:
@@ -68,7 +61,7 @@ def get_posts(db: Session = Depends(get_db)):
     "/posts",
     status_code=status.HTTP_201_CREATED,
 )
-def create_posts(post: Post, db: Session = Depends(get_db)):
+def create_posts(post: schemas.Post, db: Session = Depends(get_db)):
     # SQL query method
     # cursor.execute(
     #     """INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING *""",
@@ -117,18 +110,23 @@ def delete_post(id: int, db: Session = Depends(get_db)):
 
 
 @app.put("/posts/{id}")
-def update_post(id: int, post: Post):
-    cursor.execute(
-        """UPDATE posts SET title = %s, content = %s, published = %s WHERE id = %s RETURNING *""",
-        (post.title, post.content, post.published, id),
-    )
-    updated_post = cursor.fetchone()
-    conn.commit()
+def update_post(id: int, updated_post: schemas.Post, db: Session = Depends(get_db)):
+    # cursor.execute(
+    #     """UPDATE posts SET title = %s, content = %s, published = %s WHERE id = %s RETURNING *""",
+    #     (post.title, post.content, post.published, id),
+    # )
+    # updated_post = cursor.fetchone()
+    # conn.commit()
 
-    if updated_post == None:
+    post_query = db.query(models.Post).filter(models.Post.id == id)
+    post = post_query.first()
+
+    if post == None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"post with id: {id} does not exist.",
         )
+    post_query.update(updated_post.dict(), synchronize_session=False)
+    db.commit()
 
-    return {"data": updated_post}
+    return {"data": post_query.first()}
