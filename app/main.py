@@ -62,18 +62,18 @@ def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db)):
     #     """INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING *""",
     #     (post.title, post.content, post.published),
     # )
-    # new_post = cursor.fetchone()
+    # new_user = cursor.fetchone()
     # conn.commit()
-    new_post = models.Post(
+    new_user = models.Post(
         # unpacks dict into corresponding Post attributes
         **post.dict()
     )
-    db.add(new_post)
+    db.add(new_user)
     db.commit()
     # refresh contents of instance from db e.g. includes defaults created in db
-    db.refresh(new_post)
+    db.refresh(new_user)
 
-    return new_post
+    return new_user
 
 
 @app.get("/posts/{id}", response_model=schemas.Post)
@@ -130,3 +130,18 @@ def update_post(
     db.commit()
 
     return post_query.first()
+
+
+@app.post(
+    "/users",
+    status_code=status.HTTP_201_CREATED,  # sets status code for successful requests
+    response_model=schemas.UserCreateResponse,
+)
+def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    new_user = models.User(**user.dict())
+    db.add(new_user)
+    db.commit()
+    # refresh contents of instance from db e.g. includes defaults created in db
+    db.refresh(new_user)
+    print(type(new_user))
+    return new_user
