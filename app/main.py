@@ -1,6 +1,6 @@
 # uvicorn app.main:app --reload
 
-from typing import Optional
+from typing import Optional, List
 from fastapi import FastAPI, Response, status, HTTPException, Depends
 from fastapi.params import Body
 from psycopg2.extras import RealDictCursor
@@ -42,7 +42,7 @@ def root():
     return {"message": "That's better"}
 
 
-@app.get("/posts")
+@app.get("/posts", response_model=List[schemas.Post])
 def get_posts(db: Session = Depends(get_db)):
     # SQL query method
     # cursor.execute("""SELECT * FROM posts""")
@@ -53,7 +53,8 @@ def get_posts(db: Session = Depends(get_db)):
 
 @app.post(
     "/posts",
-    status_code=status.HTTP_201_CREATED,
+    status_code=status.HTTP_201_CREATED,  # sets status code for successful requests
+    response_model=schemas.Post,
 )
 def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db)):
     # SQL query method
@@ -63,7 +64,10 @@ def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db)):
     # )
     # new_post = cursor.fetchone()
     # conn.commit()
-    new_post = models.Post(**post.dict())
+    new_post = models.Post(
+        # unpacks dict into corresponding Post attributes
+        **post.dict()
+    )
     db.add(new_post)
     db.commit()
     # refresh contents of instance from db e.g. includes defaults created in db
@@ -72,7 +76,7 @@ def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db)):
     return new_post
 
 
-@app.get("/posts/{id}")
+@app.get("/posts/{id}", response_model=schemas.Post)
 def get_post(id: int, db: Session = Depends(get_db)):
     # cursor.execute("""SELECT * FROM posts WHERE id = %s""", str(id))
     # post = cursor.fetchone()
@@ -103,7 +107,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@app.put("/posts/{id}")
+@app.put("/posts/{id}", response_model=schemas.Post)
 def update_post(
     id: int, updated_post: schemas.PostCreate, db: Session = Depends(get_db)
 ):
