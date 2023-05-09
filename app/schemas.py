@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from datetime import datetime
 
 
@@ -22,5 +22,18 @@ class Post(PostBase):
 
     # Pydantic works with dicts. Data returned by ORM query is a sqlalchemy model.
     # Below has Pydantic read data even if its not a dict, but an ORM model.
+    class Config:
+        orm_mode = True
+
+
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class UserCreateResponse(BaseModel):
+    id: int
+    email: EmailStr
+
     class Config:
         orm_mode = True
