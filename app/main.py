@@ -6,9 +6,10 @@ from fastapi.params import Body
 from psycopg2.extras import RealDictCursor
 from time import sleep
 from dotenv import load_dotenv
-from . import models, schemas
+from . import models, schemas, utils
 from .database import engine, get_db
 from sqlalchemy.orm import Session
+
 import psycopg2
 import os
 
@@ -138,6 +139,9 @@ def update_post(
     response_model=schemas.UserCreateResponse,
 )
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    # hash the password - user.password
+    hashed_password = utils.hash(user.password)
+    user.password = hashed_password
     new_user = models.User(**user.dict())
     db.add(new_user)
     db.commit()
