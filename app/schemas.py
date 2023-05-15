@@ -20,6 +20,7 @@ class PostDelete(PostBase):
 class Post(PostBase):
     id: int
     created_at: datetime
+    user_id: int
 
     # Pydantic works with dicts. Data returned by ORM query is a sqlalchemy model.
     # Below has Pydantic read data even if its not a dict, but an ORM model.
