@@ -13,11 +13,6 @@ def get_posts(
     current_user: schemas.UserOut = Depends(oauth2.get_current_user),
     limit: int = 10,
 ):
-    # SQL query method
-    # cursor.execute("""SELECT * FROM posts""")
-    # posts = cursor.fetchall()
-    print(limit)
-
     posts = db.query(models.Post).limit(limit).all()
     return posts
 
@@ -32,14 +27,6 @@ def create_posts(
     db: Session = Depends(get_db),
     current_user: schemas.UserOut = Depends(oauth2.get_current_user),
 ):
-    # SQL query method
-    # cursor.execute(
-    #     """INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING *""",
-    #     (post.title, post.content, post.published),
-    # )
-    # new_post = cursor.fetchone()
-    # conn.commit()
-
     new_post = models.Post(
         user_id=current_user.id,
         # unpacks dict into corresponding Post attributes
@@ -59,8 +46,6 @@ def get_post(
     db: Session = Depends(get_db),
     current_user: schemas.UserOut = Depends(oauth2.get_current_user),
 ):
-    # cursor.execute("""SELECT * FROM posts WHERE id = %s""", str(id))
-    # post = cursor.fetchone()
     post = db.query(models.Post).filter(models.Post.id == id).first()
     if not post:
         raise HTTPException(
@@ -76,9 +61,6 @@ def delete_post(
     db: Session = Depends(get_db),
     current_user: schemas.UserOut = Depends(oauth2.get_current_user),
 ):
-    # cursor.execute("""DELETE FROM posts WHERE id = %s RETURNING *""", str(id))
-    # deleted_post = cursor.fetchone()
-    # conn.commit()
     post_query = db.query(models.Post).filter(models.Post.id == id)
 
     post = post_query.first()
@@ -107,13 +89,6 @@ def update_post(
     db: Session = Depends(get_db),
     current_user: schemas.UserOut = Depends(oauth2.get_current_user),
 ):
-    # cursor.execute(
-    #     """UPDATE posts SET title = %s, content = %s, published = %s WHERE id = %s RETURNING *""",
-    #     (post.title, post.content, post.published, id),
-    # )
-    # updated_post = cursor.fetchone()
-    # conn.commit()
-
     post_query = db.query(models.Post).filter(models.Post.id == id)
     post = post_query.first()
 
