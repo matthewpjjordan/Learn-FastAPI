@@ -11,11 +11,14 @@ router = APIRouter(prefix="/posts", tags=["Posts"])
 def get_posts(
     db: Session = Depends(get_db),
     current_user: schemas.UserOut = Depends(oauth2.get_current_user),
+    limit: int = 10,
 ):
     # SQL query method
     # cursor.execute("""SELECT * FROM posts""")
     # posts = cursor.fetchall()
-    posts = db.query(models.Post).all()
+    print(limit)
+
+    posts = db.query(models.Post).limit(limit).all()
     return posts
 
 
