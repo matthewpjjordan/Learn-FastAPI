@@ -6,13 +6,14 @@ from time import sleep
 import os
 import psycopg2
 import os
+from .config import settings
 
 load_dotenv()
 
-POSTGRES_HOST = os.getenv("POSTGRES_HOST")
-POSTGRES_DB = os.getenv("POSTGRES_DB")
-POSTGRES_USER = os.getenv("POSTGRES_USER")
-POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+POSTGRES_HOST = settings.POSTGRES_HOST
+POSTGRES_DB = settings.POSTGRES_DB
+POSTGRES_USER = settings.POSTGRES_USER
+POSTGRES_PASSWORD = settings.POSTGRES_PASSWORD
 
 SQLALCHEMY_DATABASE_URL = (
     f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}/{POSTGRES_DB}"
