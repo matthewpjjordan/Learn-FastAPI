@@ -2,6 +2,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
+from time import sleep
+import os
+import psycopg2
 import os
 
 load_dotenv()
@@ -27,3 +30,22 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+# reference for using psycopg2 driver instead of sqlalchemy
+# while True:
+#     try:
+#         conn = psycopg2.connect(
+#             host=os.getenv("POSTGRES_HOST"),
+#             database=os.getenv("POSTGRES_DB"),
+#             user=os.getenv("POSTGRES_USER"),
+#             password=os.getenv("POSTGRES_PASSWORD"),
+#             cursor_factory=RealDictCursor,
+#         )
+#         cursor = conn.cursor()
+#         print("Database connection was successful")
+#         break
+#     except Exception as error:
+#         print("Connecting to database failed.")
+#         print(f"Error: {error}")
+#         sleep(2)

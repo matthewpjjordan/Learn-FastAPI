@@ -1,38 +1,16 @@
 # uvicorn app.main:app --reload
 
 from fastapi import FastAPI
-from psycopg2.extras import RealDictCursor
-from time import sleep
 from dotenv import load_dotenv
 from . import models
 from .routers import post, user, auth
 from .database import engine
-import psycopg2
-import os
 
 load_dotenv()
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
-
-while True:
-    try:
-        conn = psycopg2.connect(
-            host=os.getenv("POSTGRES_HOST"),
-            database=os.getenv("POSTGRES_DB"),
-            user=os.getenv("POSTGRES_USER"),
-            password=os.getenv("POSTGRES_PASSWORD"),
-            cursor_factory=RealDictCursor,
-        )
-        cursor = conn.cursor()
-        print("Database connection was successful")
-        break
-    except Exception as error:
-        print("Connecting to database failed.")
-        print(f"Error: {error}")
-        sleep(2)
 
 # Request will enter post file and check each route in turn.
 app.include_router(post.router)
