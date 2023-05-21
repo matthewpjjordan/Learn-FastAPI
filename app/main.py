@@ -8,7 +8,8 @@ from .database import engine
 
 load_dotenv()
 
-models.Base.metadata.create_all(bind=engine)
+# Not required once alembic setup
+# models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
