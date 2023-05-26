@@ -1,17 +1,7 @@
 import pytest
 from app import schemas
-from .database import client, session
-
-
-@pytest.fixture()
-def create_test_user(client):
-    user_data = {"email": "hello3@gmail.com", "password": "supersafestring"}
-    res = client.post("/users/", json=user_data)
-
-    assert res.status_code == 201
-    new_user = res.json()
-    new_user["password"] = user_data["password"]
-    return new_user
+from jose import jwt
+from app.config import settings
 
 
 def test_root(client):
@@ -38,4 +28,11 @@ def test_login_user(client, create_test_user):
             "password": create_test_user["password"],
         },
     )
+    login_res = schemas.Token(**res.json())
+    payload = jwt.decode(
+        login_res.access_token, settings.SECRET_KEY, [settings.ALGORITHM]
+    )
+    id = payload.get("user_id")
+    assert id == create_test_user["id"]
     assert res.status_code == 200
+    assert login_res.token_type == "bearer"
