@@ -20,12 +20,12 @@ def test_create_user(client):
     assert new_user.email == "hello3@gmail.com"
 
 
-def test_login_user(client, create_test_user):
+def test_login_user(client, test_user):
     res = client.post(
         "/login",
         data={
-            "username": create_test_user["email"],
-            "password": create_test_user["password"],
+            "username": test_user["email"],
+            "password": test_user["password"],
         },
     )
     login_res = schemas.Token(**res.json())
@@ -33,6 +33,14 @@ def test_login_user(client, create_test_user):
         login_res.access_token, settings.SECRET_KEY, [settings.ALGORITHM]
     )
     id = payload.get("user_id")
-    assert id == create_test_user["id"]
+    assert id == test_user["id"]
     assert res.status_code == 200
     assert login_res.token_type == "bearer"
+
+
+def test_incorrect_login(test_user, client):
+    res = client.post(
+        "/login", data={"username": test_user["email"], "password": "wrongPassword"}
+    )
+    assert res.status_code == 403
+    assert res.json().get("detail") == "Invalid credentials"

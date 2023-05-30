@@ -48,7 +48,7 @@ def client(session):
 
 
 @pytest.fixture()
-def create_test_user(client):
+def test_user(client):
     user_data = {"email": "hello3@gmail.com", "password": "supersafestring"}
     res = client.post("/users/", json=user_data)
 
