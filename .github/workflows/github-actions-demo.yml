@@ -13,5 +13,6 @@ jobs:
     runs-on: unbuntu-20.04
     steps:
       - name: pulling git repo
-      - uses: actions/checkout@v2
-      
+        uses: actions/checkout@v2
+      - name: say hello
+        run: echo "hello"
