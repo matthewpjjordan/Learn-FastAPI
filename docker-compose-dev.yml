@@ -19,7 +19,7 @@ services:
     env_file:
       - ./.env
     volumes:
-      - local_pgdata:/var/lib/postgresql/data
+      - local_pgdatas:/var/lib/postgresql/data
 
 volumes:
-  local_pgdata:
+  local_pgdatas:
